@@ -3,6 +3,7 @@ import express, { type Express, type Request, type Response } from "express";
 import cors from "cors";
 import { config } from "./config/app.config.js";
 import logger from "./utils/logger.js";
+import { HTTP_STATUS } from "./config/http.config.js";
 
 const app: Express = express();
 const BASE_PATH = config.BASE_PATH;
@@ -17,7 +18,9 @@ app.use(
 );
 
 app.get("/", (req: Request, res: Response) => {
-  res.send("Hello World");
+  return res.status(HTTP_STATUS.OK).json({
+    message: "Welcome to Timecraft API",
+  });
 });
 
 app.listen(config.PORT, () => {
