@@ -4,6 +4,7 @@ import cors from "cors";
 import { config } from "./config/app.config.js";
 import logger from "./utils/logger.js";
 import { HTTP_STATUS } from "./config/http.config.js";
+import { globalErrorHandler } from "./middlewares/global-error-handler.middleware.js";
 
 const app: Express = express();
 const BASE_PATH = config.BASE_PATH;
@@ -22,6 +23,8 @@ app.get("/", (req: Request, res: Response) => {
     message: "Welcome to Timecraft API",
   });
 });
+
+app.use(globalErrorHandler);
 
 app.listen(config.PORT, () => {
   logger.info(`Server is running on port in http://localhost:${config.PORT}`, {
