@@ -1,3 +1,4 @@
+import "reflect-metadata";
 import { AppDataSource } from "../config/database.config.js";
 import logger from "../utils/logger.js";
 
