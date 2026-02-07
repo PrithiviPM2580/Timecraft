@@ -7,7 +7,11 @@
   "scripts": {
     "dev": "tsx watch src/index.ts",
     "build": "tsc && cp ./package.json ./dist",
-    "start": "node dist/index.js"
+    "start": "node dist/index.js",
+    "db:generate": "tsx ./node_modules/typeorm/cli.js -d src/config/database.config.ts migration:generate",
+    "db:run": "tsx ./node_modules/typeorm/cli.js -d src/config/database.config.ts migration:run",
+    "db:revert": "tsx ./node_modules/typeorm/cli.js -d src/config/database.config.ts migration:revert",
+    "db:drop": "tsx ./node_modules/typeorm/cli.js -d src/config/database.config.ts schema:drop"
   },
   "keywords": [],
   "author": "",
