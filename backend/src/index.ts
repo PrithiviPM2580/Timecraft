@@ -24,5 +24,7 @@ app.get("/", (req: Request, res: Response) => {
 });
 
 app.listen(config.PORT, () => {
-  logger.info(`Server is running on port in http://localhost:${config.PORT}`);
+  logger.info(`Server is running on port in http://localhost:${config.PORT}`, {
+    label: "Server",
+  });
 });

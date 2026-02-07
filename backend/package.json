@@ -5,7 +5,7 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "dev": "ts-node-dev --files src/index.ts",
+    "dev": "tsx watch src/index.ts",
     "build": "tsc && cp ./package.json ./dist",
     "start": "node dist/index.js"
   },
@@ -33,12 +33,11 @@
   "devDependencies": {
     "@types/bcrypt": "^6.0.0",
     "@types/cors": "^2.8.19",
-    "@types/dotenv": "^8.2.3",
     "@types/express": "^5.0.6",
     "@types/node": "^25.2.1",
     "@types/passport": "^1.0.17",
     "chalk": "^5.6.2",
-    "ts-node-dev": "^2.0.0",
+    "tsx": "^4.21.0",
     "typescript": "^5.9.3",
     "winston": "^3.19.0"
   }
