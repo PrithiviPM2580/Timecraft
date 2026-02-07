@@ -25,6 +25,7 @@
     "exactOptionalPropertyTypes": true,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
+    "strictPropertyInitialization": false,
 
     // Style Options
     // "noImplicitReturns": true,
@@ -45,5 +46,7 @@
     "noUncheckedSideEffectImports": true,
     "moduleDetection": "force",
     "skipLibCheck": true
-  }
+  },
+  "include": ["src/**/*.ts", "src/@types/**/*.ts"],
+  "exclude": ["node_modules", "test", "dist", "**/*.spec.ts"]
 }
