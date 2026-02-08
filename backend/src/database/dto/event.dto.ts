@@ -4,6 +4,7 @@ import {
   IsNumber,
   IsOptional,
   IsString,
+  IsUUID,
 } from "class-validator";
 import { EventLocationEnumType } from "../entities/event.entity.js";
 
