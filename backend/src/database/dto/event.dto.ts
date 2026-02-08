@@ -25,3 +25,9 @@ export class CreateEventDto {
   @IsNotEmpty()
   locationType: EventLocationEnumType;
 }
+
+export class EventIdDto {
+  @IsUUID(4, { message: "Invalid uuid" })
+  @IsNotEmpty()
+  eventId: string;
+}
