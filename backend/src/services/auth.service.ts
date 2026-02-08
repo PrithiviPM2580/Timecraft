@@ -3,6 +3,7 @@ import type { RegisterDto } from "../database/dto/auth.dto.js";
 import { User } from "../database/entities/user.entity.js";
 import { BadRequestException } from "../utils/app-error.js";
 import logger from "../utils/logger.js";
+import { v4 as uuidv4 } from "uuid";
 
 export const registerService = async (registerDto: RegisterDto) => {
   const userRepository = AppDataSource.getRepository(User);
@@ -18,11 +19,31 @@ export const registerService = async (registerDto: RegisterDto) => {
     throw new BadRequestException("User with this email already exists");
   }
 
+  const username = await generateUsername(registerDto.name);
   const user = userRepository.create({
     ...registerDto,
+    username,
   });
 
   await userRepository.save(user);
 
   return { user };
 };
+
+async function generateUsername(name: string): Promise<string> {
+  const cleanName = name.replace(/\s+/g, "").toLowerCase();
+  const baseUsername = cleanName;
+
+  const uuidSuffix = uuidv4().replace(/\s+/g, "").slice(0, 4);
+  const userRepository = AppDataSource.getRepository(User);
+
+  let username = `${baseUsername}${uuidSuffix}`;
+  let existingUser = await userRepository.findOne({ where: { username } });
+
+  while (existingUser) {
+    username = `${baseUsername}${uuidv4().replace(/\s+/g, "").slice(0, 4)}`;
+    existingUser = await userRepository.findOne({ where: { username } });
+  }
+
+  return username;
+}
