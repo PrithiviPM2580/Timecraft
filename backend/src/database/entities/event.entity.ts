@@ -5,6 +5,7 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   ManyToOne,
+  OneToMany,
 } from "typeorm";
 import { IntegerationAppTypeEnum } from "./integration.entity.js";
 import { User } from "./user.entity.js";
@@ -38,7 +39,7 @@ export class Event {
   @ManyToOne(() => User, (user) => user.events)
   user: User;
 
-  @ManyToOne(() => Meeting, (meeting) => meeting.event)
+  @OneToMany(() => Meeting, (meeting) => meeting.event)
   meetings: Meeting[];
 
   @CreateDateColumn({ type: "timestamptz" })
