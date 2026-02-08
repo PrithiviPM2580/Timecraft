@@ -1,4 +1,5 @@
 import "dotenv/config";
+import "./config/passport.config.js";
 import express, { type Express, type Request, type Response } from "express";
 import cors from "cors";
 import { config } from "./config/app.config.js";
@@ -7,6 +8,7 @@ import { HTTP_STATUS } from "./config/http.config.js";
 import { globalErrorHandler } from "./middlewares/global-error-handler.middleware.js";
 import { initilizeDatabase } from "./database/database.js";
 import authRouter from "./routes/auth.route.js";
+import passport from "passport";
 
 const app: Express = express();
 const BASE_PATH = config.BASE_PATH;
@@ -19,6 +21,8 @@ app.use(
     credentials: true,
   }),
 );
+
+app.use(passport.initialize());
 
 app.get("/", (req: Request, res: Response) => {
   return res.status(HTTP_STATUS.OK).json({
