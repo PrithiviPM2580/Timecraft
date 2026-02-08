@@ -100,3 +100,9 @@ export const loginService = async (loginDto: LoginDto) => {
 
   return { user: user.omitPassword(), accessToken: token, expiresAt };
 };
+
+export const findUserByIdService = async (userId: string) => {
+  const userRepository = AppDataSource.getRepository(User);
+
+  return await userRepository.findOne({ where: { id: userId } });
+};
