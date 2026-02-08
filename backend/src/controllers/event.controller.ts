@@ -1,11 +1,12 @@
 import type { Request, Response } from "express";
 import { HTTP_STATUS } from "../config/http.config.js";
-import { CreateEventDto } from "../database/dto/event.dto.js";
+import { CreateEventDto, EventIdDto } from "../database/dto/event.dto.js";
 import type { Controller } from "../@types/index.js";
 import { asyncHandlerWithValidate } from "../middlewares/with-validation.middleware.js";
 import {
   createEventService,
   getUserEventsService,
+  toggleEventPrivacyService,
 } from "../services/event.service.js";
 import logger from "../utils/logger.js";
 import { asyncHandler } from "../middlewares/async-handler.middleware.js";
@@ -66,3 +67,40 @@ export const getUserEventsController: Controller = asyncHandler(
     ``;
   },
 );
+
+export const toggleEventPrivacyController: Controller =
+  asyncHandlerWithValidate(
+    EventIdDto,
+    "body",
+    async (req: Request, res: Response, eventIdDto) => {
+      const userId = req.user?.id;
+
+      if (!userId) {
+        logger.error("Unauthorized access to toggleEventPrivacyController", {
+          label: "toggleEventPrivacyController",
+        });
+        return res.status(HTTP_STATUS.UNAUTHORIZED).json({
+          message: "User not authenticated",
+        });
+      }
+
+      const { event } = await toggleEventPrivacyService(
+        userId,
+        eventIdDto.eventId,
+      );
+
+      logger.info(
+        `Toggled privacy for event ID: ${event.id} by user ID: ${userId}`,
+        {
+          label: "toggleEventPrivacyController",
+          eventId: event.id,
+          userId,
+          isPrivate: event.isPrivate,
+        },
+      );
+      return res.status(HTTP_STATUS.OK).json({
+        message: `Event set to ${event.isPrivate ? "private" : "public"} successfully`,
+        event,
+      });
+    },
+  );
