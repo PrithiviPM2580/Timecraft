@@ -3,8 +3,13 @@ import { HTTP_STATUS } from "../config/http.config.js";
 import { CreateEventDto } from "../database/dto/event.dto.js";
 import type { Controller } from "../@types/index.js";
 import { asyncHandlerWithValidate } from "../middlewares/with-validation.middleware.js";
-import { createEventService } from "../services/event.service.js";
+import {
+  createEventService,
+  getUserEventsService,
+} from "../services/event.service.js";
 import logger from "../utils/logger.js";
+import { asyncHandler } from "../middlewares/async-handler.middleware.js";
+import { get } from "node:http";
 
 export const createEventController: Controller = asyncHandlerWithValidate(
   CreateEventDto,
@@ -29,5 +34,35 @@ export const createEventController: Controller = asyncHandlerWithValidate(
       message: "Event created successfully",
       event,
     });
+  },
+);
+
+export const getUserEventsController: Controller = asyncHandler(
+  async (req: Request, res: Response) => {
+    const userId = req.user?.id;
+
+    if (!userId) {
+      logger.error("Unauthorized access to getUserEventsController", {
+        label: "getUserEventsController",
+      });
+      return res.status(HTTP_STATUS.UNAUTHORIZED).json({
+        message: "User not authenticated",
+      });
+    }
+
+    const { events, username } = await getUserEventsService(userId);
+
+    logger.info(`Retrieved ${events.length} events for user ID: ${userId}`, {
+      label: "getUserEventsController",
+      userId,
+      username,
+    });
+
+    return res.status(HTTP_STATUS.OK).json({
+      message: "User events retrieved successfully",
+      events,
+      username,
+    });
+    ``;
   },
 );
