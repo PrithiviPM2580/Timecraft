@@ -1,10 +1,13 @@
 import { AppDataSource } from "../config/database.config.js";
+import { googleOAuth2Client } from "../config/oauth.config.js";
 import {
   IntegerationAppTypeEnum,
   IntegerationCategoryEnum,
   IntegerationproviderEnum,
   Integration,
 } from "../database/entities/integration.entity.js";
+import { BadRequestException } from "../utils/app-error.js";
+import { encodeSate } from "../utils/helper.js";
 
 const appTypeToprovideMap: Record<
   IntegerationAppTypeEnum,
@@ -71,4 +74,31 @@ export const checkUserIntegerationService = async (
   }
 
   return true;
+};
+
+export const connectAppService = async (
+  userId: string,
+  appType: IntegerationAppTypeEnum,
+) => {
+  const state = encodeSate({
+    userId,
+    appType,
+  });
+  let authUrl: string;
+
+  switch (appType) {
+    case IntegerationAppTypeEnum.GOOGLE_MEET_AND_CALENDAR:
+      authUrl = googleOAuth2Client.generateAuthUrl({
+        access_type: "offline",
+        scope: ["https://www.googleapis.com/auth/calendar.events"],
+        prompt: "consent",
+        state,
+      });
+      break;
+
+    default:
+      throw new BadRequestException("Unsupported integration type");
+  }
+
+  return { url: authUrl };
 };
