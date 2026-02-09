@@ -1,4 +1,7 @@
-import type { CreateEventDto } from "../database/dto/event.dto.js";
+import type {
+  CreateEventDto,
+  UsernameAndSlugDto,
+} from "../database/dto/event.dto.js";
 import { AppDataSource } from "../config/database.config.js";
 import {
   Event,
@@ -100,6 +103,7 @@ export const getPublicEventsByUsernameService = async (username: string) => {
       "event.description",
       "event.slug",
       "event.duration",
+      "event.locationType",
     ])
     .orderBy("event.createdAt", "DESC")
     .getOne();
@@ -119,4 +123,41 @@ export const getPublicEventsByUsernameService = async (username: string) => {
     },
     events: user.events,
   };
+};
+
+export const getPublicEventsByUsernameAndSlugService = async (
+  usernameAndSlugDto: UsernameAndSlugDto,
+) => {
+  const { username, slug } = usernameAndSlugDto;
+
+  const eventRepository = AppDataSource.getRepository(Event);
+
+  const event = await eventRepository
+    .createQueryBuilder("event")
+    .leftJoinAndSelect("event.user", "user")
+    .where("user.username = :username", { username })
+    .andWhere("event.slug = :slug", { slug })
+    .andWhere("event.isPrivate = :isPrivate", { isPrivate: false })
+    .select([
+      "event.id",
+      "event.title",
+      "event.description",
+      "event.slug",
+      "event.duration",
+      "event.locationType",
+    ])
+    .addSelect(["user.id", "user.name", "user.imageUrl"])
+    .getOne();
+
+  if (!event) {
+    logger.error(
+      `Public event not found for username: ${username} and slug: ${slug}`,
+      {
+        label: "getPublicEventsByUsernameAndSlugService",
+      },
+    );
+    throw new NotFoundException("Public event not found");
+  }
+
+  return { event };
 };
