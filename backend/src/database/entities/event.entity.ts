@@ -30,6 +30,9 @@ export class Event {
   @Column({ type: "text", nullable: false })
   slug: string;
 
+  @Column({ type: "integer", default: 30 })
+  duration: number;
+
   @Column({ type: "boolean", default: false })
   isPrivate: boolean;
 
