@@ -7,9 +7,11 @@ import { HTTP_STATUS } from "../config/http.config.js";
 import {
   getUserAvailabilityService,
   updateUserAvailabilityService,
+  getAvailabilityForPublicEventService,
 } from "../services/availability.service.js";
 import { asyncHandlerWithValidate } from "../middlewares/with-validation.middleware.js";
 import { UpdateAvailabilityDto } from "../database/dto/availability.dto.js";
+import { EventIdDto } from "../database/dto/event.dto.js";
 
 export const getUserAvailabilityController: Controller = asyncHandler(
   async (req: Request, res: Response) => {
@@ -58,6 +60,29 @@ export const updateAvailabilityController: Controller =
 
       return res.status(HTTP_STATUS.OK).json({
         message: "Update availability successfully",
+      });
+    },
+  );
+
+export const getAvailabilityForPublicEventController: Controller =
+  asyncHandlerWithValidate(
+    EventIdDto,
+    "params",
+    async (req: Request, res: Response, eventIdDto) => {
+      const availability = await getAvailabilityForPublicEventService(
+        eventIdDto.eventId,
+      );
+
+      logger.info(
+        `Fetched availability for public event ${eventIdDto.eventId}`,
+        {
+          label: "AvailabilityController",
+        },
+      );
+
+      return res.status(HTTP_STATUS.OK).json({
+        message: "Fetch availability for public event successfully",
+        availability,
       });
     },
   );
