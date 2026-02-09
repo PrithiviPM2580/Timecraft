@@ -1,6 +1,6 @@
 import type { Request, Response } from "express";
 import { LoginDto, RegisterDto } from "../database/dto/auth.dto.js";
-import { type Controller } from "../@types/index.js";
+import type { Controller } from "../@types/index.js";
 import { asyncHandlerWithValidate } from "../middlewares/with-validation.middleware.js";
 import { registerService, loginService } from "../services/auth.service.js";
 import { HTTP_STATUS } from "../config/http.config.js";

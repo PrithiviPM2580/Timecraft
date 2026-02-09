@@ -5,6 +5,7 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   ManyToOne,
+  OneToMany,
 } from "typeorm";
 import { IntegerationAppTypeEnum } from "./integration.entity.js";
 import { User } from "./user.entity.js";
@@ -29,6 +30,9 @@ export class Event {
   @Column({ type: "text", nullable: false })
   slug: string;
 
+  @Column({ type: "integer", default: 30 })
+  duration: number;
+
   @Column({ type: "boolean", default: false })
   isPrivate: boolean;
 
@@ -38,7 +42,7 @@ export class Event {
   @ManyToOne(() => User, (user) => user.events)
   user: User;
 
-  @ManyToOne(() => Meeting, (meeting) => meeting.event)
+  @OneToMany(() => Meeting, (meeting) => meeting.event)
   meetings: Meeting[];
 
   @CreateDateColumn({ type: "timestamptz" })

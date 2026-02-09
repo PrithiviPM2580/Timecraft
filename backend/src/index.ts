@@ -8,6 +8,7 @@ import { HTTP_STATUS } from "./config/http.config.js";
 import { globalErrorHandler } from "./middlewares/global-error-handler.middleware.js";
 import { initilizeDatabase } from "./database/database.js";
 import authRouter from "./routes/auth.route.js";
+import eventRouter from "./routes/event.route.js";
 import passport from "passport";
 
 const app: Express = express();
@@ -31,6 +32,7 @@ app.get("/", (req: Request, res: Response) => {
 });
 
 app.use(`${BASE_PATH}/auth`, authRouter);
+app.use(`${BASE_PATH}/event`, eventRouter);
 
 app.use(globalErrorHandler);
 
