@@ -31,3 +31,19 @@ export class EventIdDto {
   @IsNotEmpty()
   eventId: string;
 }
+
+export class UsernameDto {
+  @IsString()
+  @IsNotEmpty()
+  username: string;
+}
+
+export class UsernameAndSlugDto {
+  @IsString()
+  @IsNotEmpty()
+  username: string;
+
+  @IsString()
+  @IsNotEmpty()
+  slug: string;
+}
