@@ -14,6 +14,7 @@ import {
   toggleEventPrivacyService,
   getPublicEventsByUsernameService,
   getPublicEventsByUsernameAndSlugService,
+  deleteEventService,
 } from "../services/event.service.js";
 import logger from "../utils/logger.js";
 import { asyncHandler } from "../middlewares/async-handler.middleware.js";
@@ -157,3 +158,48 @@ export const getPublicEventsByUsernameAndSlugController: Controller =
       });
     },
   );
+
+export const deleteEventController: Controller = asyncHandlerWithValidate(
+  EventIdDto,
+  "params",
+  async (req: Request, res: Response, eventIdDto) => {
+    const userId = req.user?.id;
+
+    if (!userId) {
+      logger.error("Unauthorized access to deleteEventController", {
+        label: "deleteEventController",
+      });
+      return res.status(HTTP_STATUS.UNAUTHORIZED).json({
+        message: "User not authenticated",
+      });
+    }
+
+    const { success } = await deleteEventService(userId, eventIdDto.eventId);
+
+    if (!success) {
+      logger.error(
+        `Failed to delete event with ID: ${eventIdDto.eventId} for user ID: ${userId}`,
+        {
+          label: "deleteEventController",
+          eventId: eventIdDto.eventId,
+          userId,
+        },
+      );
+      return res.status(HTTP_STATUS.NOT_FOUND).json({
+        message: "Event not found or user not authorized to delete",
+      });
+    }
+
+    logger.info(
+      `Deleted event with ID: ${eventIdDto.eventId} for user ID: ${userId}`,
+      {
+        label: "deleteEventController",
+        eventId: eventIdDto.eventId,
+        userId,
+      },
+    );
+    return res.status(HTTP_STATUS.OK).json({
+      message: "Event deleted successfully",
+    });
+  },
+);
