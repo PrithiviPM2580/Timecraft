@@ -4,6 +4,7 @@ import {
   getUserEventsController,
   toggleEventPrivacyController,
   getPublicEventsByUsernameController,
+  getPublicEventsByUsernameAndSlugController,
 } from "../controllers/event.controller.js";
 import { passportAuthenticateJwt } from "../config/passport.config.js";
 
@@ -20,5 +21,10 @@ eventRouter.put(
 );
 
 eventRouter.get("/public/:username", getPublicEventsByUsernameController);
+
+eventRouter.get(
+  "/public/:username/:slug",
+  getPublicEventsByUsernameAndSlugController,
+);
 
 export default eventRouter;
