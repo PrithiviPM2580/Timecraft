@@ -55,3 +55,20 @@ export const getUserIntegerationsService = async (userId: string) => {
     };
   });
 };
+
+export const checkUserIntegerationService = async (
+  userId: string,
+  appType: IntegerationAppTypeEnum,
+): Promise<boolean> => {
+  const intergerationRepository = AppDataSource.getRepository(Integration);
+
+  const integeration = await intergerationRepository.findOne({
+    where: { user: { id: userId }, app_type: appType },
+  });
+
+  if (!integeration) {
+    return false;
+  }
+
+  return true;
+};
