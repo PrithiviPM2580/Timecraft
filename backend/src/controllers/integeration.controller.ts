@@ -7,6 +7,7 @@ import { NotFoundException } from "../utils/app-error.js";
 import {
   getUserIntegerationsService,
   checkUserIntegerationService,
+  connectAppService,
 } from "../services/integeration.service.js";
 import { asyncHandlerWithValidate } from "../middlewares/with-validation.middleware.js";
 import { AppTypeDto } from "../database/dto/integeration.dto.js";
@@ -52,3 +53,23 @@ export const checkUserIntegerationController: Controller =
       });
     },
   );
+
+export const connectAppController: Controller = asyncHandlerWithValidate(
+  AppTypeDto,
+  "params",
+  async (req: Request, res: Response, appTypeDto) => {
+    const userId = req.user?.id;
+
+    if (!userId) {
+      logger.error("User ID is missing in the request");
+      throw new NotFoundException("User not found");
+    }
+
+    const { url } = await connectAppService(userId, appTypeDto.appType);
+
+    return res.status(HTTP_STATUS.OK).json({
+      message: "App connected successfully",
+      url,
+    });
+  },
+);
