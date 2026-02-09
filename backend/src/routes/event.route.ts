@@ -5,6 +5,7 @@ import {
   toggleEventPrivacyController,
   getPublicEventsByUsernameController,
   getPublicEventsByUsernameAndSlugController,
+  deleteEventController,
 } from "../controllers/event.controller.js";
 import { passportAuthenticateJwt } from "../config/passport.config.js";
 
@@ -14,17 +15,19 @@ eventRouter.post("/", passportAuthenticateJwt, createEventController);
 
 eventRouter.get("/all", passportAuthenticateJwt, getUserEventsController);
 
-eventRouter.put(
-  "/toggle-privacy",
-  passportAuthenticateJwt,
-  toggleEventPrivacyController,
-);
-
 eventRouter.get("/public/:username", getPublicEventsByUsernameController);
 
 eventRouter.get(
   "/public/:username/:slug",
   getPublicEventsByUsernameAndSlugController,
 );
+
+eventRouter.put(
+  "/toggle-privacy",
+  passportAuthenticateJwt,
+  toggleEventPrivacyController,
+);
+
+eventRouter.delete("/:eventId", passportAuthenticateJwt, deleteEventController);
 
 export default eventRouter;
