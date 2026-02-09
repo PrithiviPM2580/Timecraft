@@ -3,6 +3,7 @@ import { HTTP_STATUS } from "../config/http.config.js";
 import {
   CreateEventDto,
   EventIdDto,
+  UsernameAndSlugDto,
   UsernameDto,
 } from "../database/dto/event.dto.js";
 import type { Controller } from "../@types/index.js";
@@ -12,6 +13,7 @@ import {
   getUserEventsService,
   toggleEventPrivacyService,
   getPublicEventsByUsernameService,
+  getPublicEventsByUsernameAndSlugService,
 } from "../services/event.service.js";
 import logger from "../utils/logger.js";
 import { asyncHandler } from "../middlewares/async-handler.middleware.js";
@@ -129,6 +131,29 @@ export const getPublicEventsByUsernameController: Controller =
         message: "Public events retrieved successfully",
         user,
         events,
+      });
+    },
+  );
+
+export const getPublicEventsByUsernameAndSlugController: Controller =
+  asyncHandlerWithValidate(
+    UsernameAndSlugDto,
+    "params",
+    async (req: Request, res: Response, usernameAndSlugDto) => {
+      const { event } =
+        await getPublicEventsByUsernameAndSlugService(usernameAndSlugDto);
+
+      logger.info(
+        `Retrieved public event for username: ${usernameAndSlugDto.username} and slug: ${usernameAndSlugDto.slug}`,
+        {
+          label: "getPublicEventsByUsernameAndSlugController",
+          username: usernameAndSlugDto.username,
+          slug: usernameAndSlugDto.slug,
+        },
+      );
+      return res.status(HTTP_STATUS.OK).json({
+        message: "Public event retrieved successfully",
+        event,
       });
     },
   );
