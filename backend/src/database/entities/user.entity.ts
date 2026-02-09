@@ -46,7 +46,9 @@ export class User {
   })
   integrations: Integration[];
 
-  @OneToOne(() => Availability, (availability) => availability.user)
+  @OneToOne(() => Availability, (availability) => availability.user, {
+    cascade: true,
+  })
   @JoinColumn()
   availability: Availability;
 
