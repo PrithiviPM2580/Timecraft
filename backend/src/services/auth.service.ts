@@ -15,8 +15,6 @@ import { signJwtToken } from "../utils/jwt.js";
 export const registerService = async (registerDto: RegisterDto) => {
   const userRepository = AppDataSource.getRepository(User);
   const availabilityRepository = AppDataSource.getRepository(Availability);
-  const dayAvailabilityRepository =
-    AppDataSource.getRepository(DayAvailability);
 
   const existingUser = await userRepository.findOne({
     where: { email: registerDto.email },
