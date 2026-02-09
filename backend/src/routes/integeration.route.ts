@@ -2,6 +2,7 @@ import { Router } from "express";
 import { passportAuthenticateJwt } from "../config/passport.config.js";
 import {
   checkUserIntegerationController,
+  connectAppController,
   getUserIntegerationController,
 } from "../controllers/integeration.controller.js";
 
@@ -17,6 +18,12 @@ integerationRouter.get(
   "/check/:appType",
   passportAuthenticateJwt,
   checkUserIntegerationController,
+);
+
+integerationRouter.get(
+  "/connect/:appType",
+  passportAuthenticateJwt,
+  connectAppController,
 );
 
 export default integerationRouter;
