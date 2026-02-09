@@ -83,3 +83,40 @@ export const toggleEventPrivacyService = async (
 
   return { event };
 };
+
+export const getPublicEventsByUsernameService = async (username: string) => {
+  const userRepository = AppDataSource.getRepository(User);
+
+  const user = await userRepository
+    .createQueryBuilder("user")
+    .leftJoinAndSelect("user.events", "event", "event.isPrivate = :isPrivate", {
+      isPrivate: false,
+    })
+    .where("user.username = :username", { username })
+    .select(["user.id", "user.name", "user.imageUrl"])
+    .addSelect([
+      "event.id",
+      "event.title",
+      "event.description",
+      "event.slug",
+      "event.duration",
+    ])
+    .orderBy("event.createdAt", "DESC")
+    .getOne();
+
+  if (!user) {
+    logger.error(`User not found with username: ${username}`, {
+      label: "getPublicEventsByUsernameService",
+    });
+    throw new NotFoundException("User not found");
+  }
+
+  return {
+    user: {
+      name: user.name,
+      username: username,
+      imageUrl: user.imageUrl,
+    },
+    events: user.events,
+  };
+};
