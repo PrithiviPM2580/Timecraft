@@ -1,16 +1,20 @@
 import type { Request, Response } from "express";
 import { HTTP_STATUS } from "../config/http.config.js";
-import { CreateEventDto, EventIdDto } from "../database/dto/event.dto.js";
+import {
+  CreateEventDto,
+  EventIdDto,
+  UsernameDto,
+} from "../database/dto/event.dto.js";
 import type { Controller } from "../@types/index.js";
 import { asyncHandlerWithValidate } from "../middlewares/with-validation.middleware.js";
 import {
   createEventService,
   getUserEventsService,
   toggleEventPrivacyService,
+  getPublicEventsByUsernameService,
 } from "../services/event.service.js";
 import logger from "../utils/logger.js";
 import { asyncHandler } from "../middlewares/async-handler.middleware.js";
-import { get } from "node:http";
 
 export const createEventController: Controller = asyncHandlerWithValidate(
   CreateEventDto,
@@ -64,7 +68,6 @@ export const getUserEventsController: Controller = asyncHandler(
       events,
       username,
     });
-    ``;
   },
 );
 
@@ -101,6 +104,31 @@ export const toggleEventPrivacyController: Controller =
       return res.status(HTTP_STATUS.OK).json({
         message: `Event set to ${event.isPrivate ? "private" : "public"} successfully`,
         event,
+      });
+    },
+  );
+
+export const getPublicEventsByUsernameController: Controller =
+  asyncHandlerWithValidate(
+    UsernameDto,
+    "params",
+    async (req: Request, res: Response, usernameDto) => {
+      const { user, events } = await getPublicEventsByUsernameService(
+        usernameDto.username,
+      );
+
+      logger.info(
+        `Retrieved ${events.length} public events for username: ${usernameDto.username}`,
+        {
+          label: "getPublicEventsByUsernameController",
+          username: usernameDto.username,
+          eventCount: events.length,
+        },
+      );
+      return res.status(HTTP_STATUS.OK).json({
+        message: "Public events retrieved successfully",
+        user,
+        events,
       });
     },
   );
