@@ -9,6 +9,7 @@ import { globalErrorHandler } from "./middlewares/global-error-handler.middlewar
 import { initilizeDatabase } from "./database/database.js";
 import authRouter from "./routes/auth.route.js";
 import eventRouter from "./routes/event.route.js";
+import availabilityRouter from "./routes/availability.route.js";
 import passport from "passport";
 
 const app: Express = express();
@@ -33,6 +34,7 @@ app.get("/", (req: Request, res: Response) => {
 
 app.use(`${BASE_PATH}/auth`, authRouter);
 app.use(`${BASE_PATH}/event`, eventRouter);
+app.use(`${BASE_PATH}/availability`, availabilityRouter);
 
 app.use(globalErrorHandler);
 
