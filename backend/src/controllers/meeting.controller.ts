@@ -8,7 +8,12 @@ import {
   MeetingFilterEnum,
   type MeetingFilterEnumType,
 } from "../enums/meeting.enum.js";
-import { getUserMeetingsService } from "../services/meeting.service.js";
+import {
+  getUserMeetingsService,
+  createMeetingBookingForGuestService,
+} from "../services/meeting.service.js";
+import { asyncHandlerWithValidate } from "../middlewares/with-validation.middleware.js";
+import { CreateMeetingDTO } from "../database/dto/meeting.dto.js";
 
 export const getUserMeetingsController: Controller = asyncHandler(
   async (req: Request, res: Response) => {
@@ -31,3 +36,18 @@ export const getUserMeetingsController: Controller = asyncHandler(
     });
   },
 );
+
+export const createMeetingBookingForGuestController: Controller =
+  asyncHandlerWithValidate(
+    CreateMeetingDTO,
+    "body",
+    async (req: Request, res: Response, createMeetingDto) => {
+      const { meetLink, meeting } =
+        await createMeetingBookingForGuestService(createMeetingDto);
+      return res.status(HTTP_STATUS.OK).json({
+        message: "Meeting scheduled successfully",
+        meetLink,
+        meeting,
+      });
+    },
+  );
