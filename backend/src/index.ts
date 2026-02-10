@@ -11,6 +11,7 @@ import authRouter from "./routes/auth.route.js";
 import eventRouter from "./routes/event.route.js";
 import availabilityRouter from "./routes/availability.route.js";
 import integerationRouter from "./routes/integration.route.js";
+import meetingRouter from "./routes/meeting.route.js";
 import passport from "passport";
 
 const app: Express = express();
@@ -37,6 +38,7 @@ app.use(`${BASE_PATH}/auth`, authRouter);
 app.use(`${BASE_PATH}/event`, eventRouter);
 app.use(`${BASE_PATH}/availability`, availabilityRouter);
 app.use(`${BASE_PATH}/integration`, integerationRouter);
+app.use(`${BASE_PATH}/meeting`, meetingRouter);
 
 app.use(globalErrorHandler);
 
