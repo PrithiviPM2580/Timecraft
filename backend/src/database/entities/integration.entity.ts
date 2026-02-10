@@ -12,6 +12,7 @@ import { User } from "./user.entity.js";
 export enum IntegerationproviderEnum {
   GOOGLE = "GOOGLE",
   ZOOM = "ZOOM",
+  MICROSOFT = "MICROSOFT",
 }
 
 export enum IntegerationAppTypeEnum {
