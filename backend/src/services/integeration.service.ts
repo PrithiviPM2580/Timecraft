@@ -8,6 +8,7 @@ import {
 } from "../database/entities/integration.entity.js";
 import { BadRequestException } from "../utils/app-error.js";
 import { encodeSate } from "../utils/helper.js";
+import logger from "../utils/logger.js";
 
 const appTypeToprovideMap: Record<
   IntegerationAppTypeEnum,
@@ -101,4 +102,61 @@ export const connectAppService = async (
   }
 
   return { url: authUrl };
+};
+
+export const createIntegerationService = async (data: {
+  userId: string;
+  provider: IntegerationproviderEnum;
+  category: IntegerationCategoryEnum;
+  app_type: IntegerationAppTypeEnum;
+  access_token: string;
+  refresh_token?: string;
+  expiry_date?: number | null;
+  metadata?: Record<string, any>;
+}) => {
+  const intergerationRepository = AppDataSource.getRepository(Integration);
+
+  const existingIntegeration = await intergerationRepository.findOne({
+    where: { userId: data.userId, app_type: data.app_type },
+  });
+
+  if (existingIntegeration) {
+    logger.error(
+      `Integration already exists for user ${data.userId} and app type ${data.app_type}`,
+    );
+    throw new BadRequestException(`${data.app_type} already connected`);
+  }
+
+  const integeration = intergerationRepository.create({
+    provider: data.provider,
+    category: data.category,
+    app_type: data.app_type,
+    access_token: data.access_token,
+    refresh_token: data.refresh_token,
+    expiry_date: data.expiry_date,
+    metadata: data.metadata,
+    userId: data.userId,
+    isConnected: true,
+  });
+
+  await intergerationRepository.save(integeration);
+
+  return integeration;
+};
+
+export const validateGoogleToken = async (
+  accessToken: string,
+  refreshToken: string,
+  expiryDate: number | null,
+) => {
+  if (expiryDate === null || Date.now() >= expiryDate) {
+    googleOAuth2Client.setCredentials({
+      refresh_token: refreshToken,
+    });
+
+    const { credentials } = await googleOAuth2Client.refreshAccessToken();
+    return credentials.access_token;
+  }
+
+  return accessToken;
 };
