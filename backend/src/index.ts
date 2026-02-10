@@ -10,7 +10,7 @@ import { initilizeDatabase } from "./database/database.js";
 import authRouter from "./routes/auth.route.js";
 import eventRouter from "./routes/event.route.js";
 import availabilityRouter from "./routes/availability.route.js";
-import integerationRouter from "./routes/integeration.route.js";
+import integerationRouter from "./routes/integration.route.js";
 import passport from "passport";
 
 const app: Express = express();
@@ -36,7 +36,7 @@ app.get("/", (req: Request, res: Response) => {
 app.use(`${BASE_PATH}/auth`, authRouter);
 app.use(`${BASE_PATH}/event`, eventRouter);
 app.use(`${BASE_PATH}/availability`, availabilityRouter);
-app.use(`${BASE_PATH}/integeration`, integerationRouter);
+app.use(`${BASE_PATH}/integration`, integerationRouter);
 
 app.use(globalErrorHandler);
 
