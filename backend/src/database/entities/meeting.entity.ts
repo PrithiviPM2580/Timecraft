@@ -46,7 +46,11 @@ export class Meeting {
   @Column({ type: "text" })
   calendarEventId: string;
 
-  @Column({ type: "enum", enum: MeetingStatusEnum })
+  @Column({
+    type: "enum",
+    enum: MeetingStatusEnum,
+    default: MeetingStatusEnum.SCHEDULED,
+  })
   status: MeetingStatusEnum;
 
   @CreateDateColumn({ type: "timestamptz" })
