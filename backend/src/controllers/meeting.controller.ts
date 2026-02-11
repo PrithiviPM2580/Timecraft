@@ -11,9 +11,10 @@ import {
 import {
   getUserMeetingsService,
   createMeetingBookingForGuestService,
+  cancelMeetingService,
 } from "../services/meeting.service.js";
 import { asyncHandlerWithValidate } from "../middlewares/with-validation.middleware.js";
-import { CreateMeetingDTO } from "../database/dto/meeting.dto.js";
+import { CreateMeetingDTO, MeetingDto } from "../database/dto/meeting.dto.js";
 
 export const getUserMeetingsController: Controller = asyncHandler(
   async (req: Request, res: Response) => {
@@ -51,3 +52,14 @@ export const createMeetingBookingForGuestController: Controller =
       });
     },
   );
+
+export const cancelMeetingController: Controller = asyncHandlerWithValidate(
+  MeetingDto,
+  "params",
+  async (req: Request, res: Response, meetingDto) => {
+    await cancelMeetingService(meetingDto.meetingId);
+    return res.status(HTTP_STATUS.OK).json({
+      message: "Meeting cancelled successfully",
+    });
+  },
+);

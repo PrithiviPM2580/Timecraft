@@ -11,6 +11,7 @@ import { LessThan, MoreThan } from "typeorm";
 import type { CreateMeetingDTO } from "../database/dto/meeting.dto.js";
 import {
   IntegerationAppTypeEnum,
+  IntegerationCategoryEnum,
   Integration,
 } from "../database/entities/integration.entity.js";
 import { BadRequestException, NotFoundException } from "../utils/app-error.js";
@@ -21,6 +22,7 @@ import {
 import { validateGoogleToken } from "./integeration.service.js";
 import { googleOAuth2Client } from "../config/oauth.config.js";
 import { google } from "googleapis";
+import logger from "../utils/logger.js";
 
 export const getUserMeetingsService = async (
   userId: string,
@@ -166,3 +168,62 @@ async function getCalenderClient(
       throw new BadRequestException(`Unsupported Calendar provider ${appType}`);
   }
 }
+
+export const cancelMeetingService = async (meetingId: string) => {
+  const meetingRepository = AppDataSource.getRepository(Meeting);
+  const integrationRepository = AppDataSource.getRepository(Integration);
+
+  const meeting = await meetingRepository.findOne({
+    where: { id: meetingId },
+    relations: ["event", "event.user"],
+  });
+
+  if (!meeting) throw new NotFoundException("Meeting not found");
+
+  const calendarIntegration = await integrationRepository.findOne({
+    where: [
+      {
+        user: { id: meeting.event.user.id },
+        category: IntegerationCategoryEnum.CALENDAR_AND_VIDEO_CONFERENCING,
+      },
+      {
+        user: { id: meeting.event.user.id },
+        category: IntegerationCategoryEnum.CALENDAR,
+      },
+    ],
+  });
+
+  try {
+    if (calendarIntegration) {
+      const { calendar, calendarType } = await getCalenderClient(
+        calendarIntegration.app_type,
+        calendarIntegration.access_token,
+        calendarIntegration.refresh_token,
+        calendarIntegration.expiry_date,
+      );
+
+      switch (calendarType) {
+        case IntegerationAppTypeEnum.GOOGLE_MEET_AND_CALENDAR:
+          await calendar.events.delete({
+            calendarId: "primary",
+            eventId: meeting.calendarEventId,
+          });
+          break;
+        default:
+          throw new BadRequestException(
+            `Unsupported Calendar provider ${calendarType}`,
+          );
+      }
+    }
+  } catch (error) {
+    logger.error(
+      `Failed to cancel calendar event for meeting ${meetingId}: ${error}`,
+    );
+    throw new BadRequestException("Failed to delete event from the calendar.");
+  }
+
+  meeting.status = MeetingStatusEnum.CANCELED;
+  await meetingRepository.save(meeting);
+
+  return { success: true };
+};

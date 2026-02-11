@@ -4,6 +4,7 @@ import {
   IsNotEmpty,
   IsOptional,
   IsString,
+  IsUUID,
 } from "class-validator";
 
 export class CreateMeetingDTO {
@@ -30,4 +31,10 @@ export class CreateMeetingDTO {
   @IsString()
   @IsOptional()
   additionalInfo: string;
+}
+
+export class MeetingDto {
+  @IsUUID(4, { message: "Invalid uuid" })
+  @IsNotEmpty()
+  meetingId: string;
 }
